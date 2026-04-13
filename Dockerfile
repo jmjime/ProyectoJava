@@ -12,4 +12,5 @@ COPY --from=build /app/target/servicio-precios-1.0.0-SNAPSHOT.jar /app/app.jar
 RUN chown nobody:nogroup /app/app.jar
 USER nobody
 EXPOSE 8080
+# Perfiles: Spring Boot lee `SPRING_PROFILES_ACTIVE` del entorno en runtime (p. ej. `docker run -e SPRING_PROFILES_ACTIVE=prod`).
 ENTRYPOINT ["java", "-jar", "/app/app.jar"]

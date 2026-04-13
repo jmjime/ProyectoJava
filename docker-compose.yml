@@ -5,5 +5,8 @@ services:
     ports:
       - "8080:8080"
     environment:
-      # Opcional: SPRING_PROFILES_ACTIVE=docker
-      - TZ=Europe/Madrid
+      TZ: Europe/Madrid
+      # Spring Boot: activa perfiles (coma-separados). Vacío = perfil por defecto (OpenAPI activo).
+      # Valor típico: `prod` (desactiva OpenAPI/Swagger según `application.yml`).
+      # Puedes definirlo en un fichero `.env` junto a este YAML (Compose lo usa en sustitución) o exportarlo en la shell.
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-}

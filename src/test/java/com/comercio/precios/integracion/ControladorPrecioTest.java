@@ -1,5 +1,6 @@
 package com.comercio.precios.integracion;
 
+import static org.hamcrest.Matchers.containsString;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -37,7 +38,9 @@ class ControladorPrecioTest {
                 .andExpect(jsonPath("$.idCadena").value(1))
                 .andExpect(jsonPath("$.tarifa").value(1))
                 .andExpect(jsonPath("$.precio").value(35.50))
-                .andExpect(jsonPath("$.moneda").value("EUR"));
+                .andExpect(jsonPath("$.moneda").value("EUR"))
+                .andExpect(jsonPath("$.fechaInicio").value("2020-06-14T00:00:00"))
+                .andExpect(jsonPath("$.fechaFin").value("2020-12-31T23:59:59"));
     }
 
     /**
@@ -52,8 +55,13 @@ class ControladorPrecioTest {
                                 .param("idProducto", "35455")
                                 .param("idCadena", "1"))
                 .andExpect(status().isOk())
+                .andExpect(jsonPath("$.idProducto").value(35455))
+                .andExpect(jsonPath("$.idCadena").value(1))
                 .andExpect(jsonPath("$.tarifa").value(2))
-                .andExpect(jsonPath("$.precio").value(25.45));
+                .andExpect(jsonPath("$.precio").value(25.45))
+                .andExpect(jsonPath("$.moneda").value("EUR"))
+                .andExpect(jsonPath("$.fechaInicio").value("2020-06-14T15:00:00"))
+                .andExpect(jsonPath("$.fechaFin").value("2020-06-14T18:30:00"));
     }
 
     /**
@@ -68,8 +76,11 @@ class ControladorPrecioTest {
                                 .param("idProducto", "35455")
                                 .param("idCadena", "1"))
                 .andExpect(status().isOk())
+                .andExpect(jsonPath("$.idProducto").value(35455))
+                .andExpect(jsonPath("$.idCadena").value(1))
                 .andExpect(jsonPath("$.tarifa").value(1))
-                .andExpect(jsonPath("$.precio").value(35.50));
+                .andExpect(jsonPath("$.precio").value(35.50))
+                .andExpect(jsonPath("$.moneda").value("EUR"));
     }
 
     /**
@@ -84,8 +95,13 @@ class ControladorPrecioTest {
                                 .param("idProducto", "35455")
                                 .param("idCadena", "1"))
                 .andExpect(status().isOk())
+                .andExpect(jsonPath("$.idProducto").value(35455))
+                .andExpect(jsonPath("$.idCadena").value(1))
                 .andExpect(jsonPath("$.tarifa").value(3))
-                .andExpect(jsonPath("$.precio").value(30.50));
+                .andExpect(jsonPath("$.precio").value(30.50))
+                .andExpect(jsonPath("$.moneda").value("EUR"))
+                .andExpect(jsonPath("$.fechaInicio").value("2020-06-15T00:00:00"))
+                .andExpect(jsonPath("$.fechaFin").value("2020-06-15T11:00:00"));
     }
 
     /**
@@ -100,7 +116,24 @@ class ControladorPrecioTest {
                                 .param("idProducto", "35455")
                                 .param("idCadena", "1"))
                 .andExpect(status().isOk())
+                .andExpect(jsonPath("$.idProducto").value(35455))
+                .andExpect(jsonPath("$.idCadena").value(1))
                 .andExpect(jsonPath("$.tarifa").value(4))
-                .andExpect(jsonPath("$.precio").value(38.95));
+                .andExpect(jsonPath("$.precio").value(38.95))
+                .andExpect(jsonPath("$.moneda").value("EUR"))
+                .andExpect(jsonPath("$.fechaInicio").value("2020-06-15T16:00:00"))
+                .andExpect(jsonPath("$.fechaFin").value("2020-12-31T23:59:59"));
+    }
+
+    @Test
+    @DisplayName("Sin tarifa aplicable responde 404 con mensaje en JSON")
+    void sinPrecio_responde404() throws Exception {
+        mockMvc.perform(
+                        get("/api/precios")
+                                .param("fechaAplicacion", "2019-01-01T10:00:00")
+                                .param("idProducto", "35455")
+                                .param("idCadena", "1"))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.mensaje").value(containsString("35455")));
     }
 }

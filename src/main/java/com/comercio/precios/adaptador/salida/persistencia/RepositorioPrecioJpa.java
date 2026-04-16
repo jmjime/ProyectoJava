@@ -1,7 +1,7 @@
 package com.comercio.precios.adaptador.salida.persistencia;
 
 import java.time.LocalDateTime;
-import java.util.List;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -19,7 +19,7 @@ public interface RepositorioPrecioJpa extends JpaRepository<EntidadPrecioJpa, Lo
      * @param idProducto  producto
      * @param fecha       instante de aplicación
      * @param pageable    limita a una fila para eficiencia
-     * @return lista con como máximo un elemento
+     * @return página con como máximo un elemento (según {@code pageable})
      */
     @Query(
             """
@@ -30,7 +30,7 @@ public interface RepositorioPrecioJpa extends JpaRepository<EntidadPrecioJpa, Lo
               AND :fecha <= p.fechaFin
             ORDER BY p.prioridad DESC
             """)
-    List<EntidadPrecioJpa> buscarAplicables(
+    Page<EntidadPrecioJpa> buscarAplicables(
             @Param("idCadena") Long idCadena,
             @Param("idProducto") Long idProducto,
             @Param("fecha") LocalDateTime fecha,

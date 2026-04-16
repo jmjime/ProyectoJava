@@ -68,7 +68,13 @@ curl -s "http://localhost:8080/api/precios?fechaAplicacion=2020-06-14T16:00:00&i
 mvn test
 ```
 
-Incluye **5 pruebas de integración** (`ControladorPrecioIT`) que reproducen los escenarios del enunciado y **1 prueba** (`OpenApiDocsIT`) que comprueba que `/v3/api-docs` responde e incluye el path `/api/precios`. Los ficheros `*IT.java` están incluidos explícitamente en **Surefire**.
+**Cobertura (JaCoCo):** informe HTML en `target/site/jacoco/index.html`. Umbral mínimo de líneas del bundle (propiedad `jacoco.line.minimum` en el `pom`) en la fase `verify`:
+
+```bash
+mvn verify
+```
+
+Hay **pruebas de integración** (`ControladorPrecioTest`, `OpenApiDocsTest`) sobre el contexto completo, **pruebas unitarias** del caso de uso (`ObtenerPrecioAplicableCasoUsoTest`) y del mapeo DTO (`RespuestaPrecioDtoTest`). Surefire incluye `*Test.java`, `*Tests.java` y `*IT.java`.
 
 ## Docker
 

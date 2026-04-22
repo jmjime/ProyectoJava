@@ -21,7 +21,8 @@
         <java.version>17</java.version>
         <springdoc.version>3.0.2</springdoc.version>
         <jacoco.version>0.8.13</jacoco.version>
-        <jacoco.line.minimum>0.70</jacoco.line.minimum>
+        <jacoco.line.minimum>0.85</jacoco.line.minimum>
+        <jacoco.branch.minimum>0.75</jacoco.branch.minimum>
     </properties>
 
     <dependencies>
@@ -64,6 +65,11 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-webmvc-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-jpa-test</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -137,6 +143,14 @@
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
                 <version>${jacoco.version}</version>
+                <configuration>
+                    <excludes>
+                        <exclude>**/PreciosApplication.*</exclude>
+                        <exclude>**/configuracion/BeansAplicacion.*</exclude>
+                        <exclude>**/*Dto.*</exclude>
+                        <exclude>**/EntidadPrecioJpa.*</exclude>
+                    </excludes>
+                </configuration>
                 <executions>
                     <execution>
                         <id>jacoco-prepare-agent</id>
@@ -166,6 +180,11 @@
                                             <counter>LINE</counter>
                                             <value>COVEREDRATIO</value>
                                             <minimum>${jacoco.line.minimum}</minimum>
+                                        </limit>
+                                        <limit>
+                                            <counter>BRANCH</counter>
+                                            <value>COVEREDRATIO</value>
+                                            <minimum>${jacoco.branch.minimum}</minimum>
                                         </limit>
                                     </limits>
                                 </rule>

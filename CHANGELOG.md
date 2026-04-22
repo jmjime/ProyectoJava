@@ -29,8 +29,17 @@ y el proyecto adhiere a [Semantic Versioning 2.0.0](https://semver.org/lang/es/)
 - Puerto entrante `com.comercio.precios.dominio.puerto.entrada.ConsultarPrecioAplicable` y reubicación del puerto saliente `PuertoRepositorioPrecios` a `com.comercio.precios.dominio.puerto.salida`.
 - `com.comercio.precios.configuracion.BeansAplicacion` registra el caso de uso como `@Bean`, materializando ADR-5 (arranque Spring invertido hacia configuración). El dominio y la aplicación quedan libres de imports de `org.springframework.*`.
 - Test de arquitectura `ArquitecturaHexagonalTest` con ArchUnit 1.4.1 (`scope=test`) que verifica: (a) `dominio` y `aplicacion` no dependen de `org.springframework..`; (b) `dominio` no depende de `jakarta.persistence..`.
+- `RepositorioPrecioJpaTest` (`@DataJpaTest` + `@Sql`) que fija el contrato del método derivado: camino feliz, desempate por `fechaInicio` más reciente, desempate por `id` mayor y `Optional.empty()` sin filas. Habilita `hibernate.generate_statistics` y asegura con `Statistics#getQueryExecutionCount` que la consulta se resuelve con una única `SELECT … LIMIT 1` (sin `count` paginador).
+- `AdaptadorRepositorioPreciosTest` con Mockito (mapeo entidad → dominio campo a campo y orden canónico de argumentos al repositorio mediante `ArgumentCaptor`).
+- Casos adicionales en `PrecioTest` para las invariantes de rango: fechas incoherentes, `precioFinal` negativo y formato de `moneda` (longitud y mayúsculas) lanzan `IllegalArgumentException`.
+- Perfil de pruebas dedicado: `src/test/resources/application-test.yml` con H2 aislada, `ddl-auto=create-drop` y springdoc habilitado; `@ActiveProfiles("test")` aplicado a `ControladorPrecioTest`, `OpenApiDocsTest` y `ControladorPrecioWebMvcTest`.
+- Dependencia `org.springframework.boot:spring-boot-starter-data-jpa-test` (scope `test`) requerida por Spring Boot 4 para `@DataJpaTest`.
 
-> Esta entrada corresponde a los subconjuntos **control-versiones**, **persistencia-eficiente** y **dominio-hexagonal** del cambio `revision` (ver `openspec/changes/revision/`). La capacidad `testing-robusto` permanece pendiente de aplicar en commits posteriores.
+### Changed
+
+- Umbrales JaCoCo elevados a `LINE ≥ 0.85` y `BRANCH ≥ 0.75` a nivel `BUNDLE`; se añaden exclusiones explícitas (`PreciosApplication`, `BeansAplicacion`, `*Dto`, `EntidadPrecioJpa`) para que la medida se centre en la lógica de negocio y adaptación.
+
+> Esta entrada acumula los subconjuntos **control-versiones**, **persistencia-eficiente**, **dominio-hexagonal** y **testing-robusto** del cambio `revision` (ver `openspec/changes/revision/`). Queda pendiente el grupo 7 (*validación final y PR*) antes del archivo.
 
 ## [0.1.0] - 2026-04-16
 

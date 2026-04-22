@@ -1,5 +1,6 @@
 package com.comercio.precios.integracion;
 
+import static org.hamcrest.Matchers.containsString;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -7,6 +8,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.jdbc.Sql;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.web.servlet.MockMvc;
@@ -37,7 +39,9 @@ class ControladorPrecioTest {
                 .andExpect(jsonPath("$.idCadena").value(1))
                 .andExpect(jsonPath("$.tarifa").value(1))
                 .andExpect(jsonPath("$.precio").value(35.50))
-                .andExpect(jsonPath("$.moneda").value("EUR"));
+                .andExpect(jsonPath("$.moneda").value("EUR"))
+                .andExpect(jsonPath("$.fechaInicio").value("2020-06-14T00:00:00"))
+                .andExpect(jsonPath("$.fechaFin").value("2020-12-31T23:59:59"));
     }
 
     /**
@@ -52,8 +56,13 @@ class ControladorPrecioTest {
                                 .param("idProducto", "35455")
                                 .param("idCadena", "1"))
                 .andExpect(status().isOk())
+                .andExpect(jsonPath("$.idProducto").value(35455))
+                .andExpect(jsonPath("$.idCadena").value(1))
                 .andExpect(jsonPath("$.tarifa").value(2))
-                .andExpect(jsonPath("$.precio").value(25.45));
+                .andExpect(jsonPath("$.precio").value(25.45))
+                .andExpect(jsonPath("$.moneda").value("EUR"))
+                .andExpect(jsonPath("$.fechaInicio").value("2020-06-14T15:00:00"))
+                .andExpect(jsonPath("$.fechaFin").value("2020-06-14T18:30:00"));
     }
 
     /**
@@ -68,8 +77,11 @@ class ControladorPrecioTest {
                                 .param("idProducto", "35455")
                                 .param("idCadena", "1"))
                 .andExpect(status().isOk())
+                .andExpect(jsonPath("$.idProducto").value(35455))
+                .andExpect(jsonPath("$.idCadena").value(1))
                 .andExpect(jsonPath("$.tarifa").value(1))
-                .andExpect(jsonPath("$.precio").value(35.50));
+                .andExpect(jsonPath("$.precio").value(35.50))
+                .andExpect(jsonPath("$.moneda").value("EUR"));
     }
 
     /**
@@ -84,8 +96,13 @@ class ControladorPrecioTest {
                                 .param("idProducto", "35455")
                                 .param("idCadena", "1"))
                 .andExpect(status().isOk())
+                .andExpect(jsonPath("$.idProducto").value(35455))
+                .andExpect(jsonPath("$.idCadena").value(1))
                 .andExpect(jsonPath("$.tarifa").value(3))
-                .andExpect(jsonPath("$.precio").value(30.50));
+                .andExpect(jsonPath("$.precio").value(30.50))
+                .andExpect(jsonPath("$.moneda").value("EUR"))
+                .andExpect(jsonPath("$.fechaInicio").value("2020-06-15T00:00:00"))
+                .andExpect(jsonPath("$.fechaFin").value("2020-06-15T11:00:00"));
     }
 
     /**
@@ -100,7 +117,154 @@ class ControladorPrecioTest {
                                 .param("idProducto", "35455")
                                 .param("idCadena", "1"))
                 .andExpect(status().isOk())
+                .andExpect(jsonPath("$.idProducto").value(35455))
+                .andExpect(jsonPath("$.idCadena").value(1))
                 .andExpect(jsonPath("$.tarifa").value(4))
-                .andExpect(jsonPath("$.precio").value(38.95));
+                .andExpect(jsonPath("$.precio").value(38.95))
+                .andExpect(jsonPath("$.moneda").value("EUR"))
+                .andExpect(jsonPath("$.fechaInicio").value("2020-06-15T16:00:00"))
+                .andExpect(jsonPath("$.fechaFin").value("2020-12-31T23:59:59"));
+    }
+
+    @Test
+    @Sql("/test-desempate-misma-prioridad.sql")
+    @DisplayName("Misma prioridad y solape: gana la tarifa con fecha_inicio más reciente")
+    void desempate_mismaPrioridad_fechaInicioMasReciente() throws Exception {
+        mockMvc.perform(
+                        get("/api/precios")
+                                .param("fechaAplicacion", "2020-07-01T10:00:00")
+                                .param("idProducto", "99901")
+                                .param("idCadena", "1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.tarifa").value(11))
+                .andExpect(jsonPath("$.precio").value(99.99))
+                .andExpect(jsonPath("$.fechaInicio").value("2020-07-01T08:00:00"));
+    }
+
+    @Test
+    @DisplayName("Sin tarifa aplicable responde 404 con mensaje en JSON")
+    void sinPrecio_responde404() throws Exception {
+        mockMvc.perform(
+                        get("/api/precios")
+                                .param("fechaAplicacion", "2019-01-01T10:00:00")
+                                .param("idProducto", "35455")
+                                .param("idCadena", "1"))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.mensaje").value(containsString("35455")));
+    }
+
+    @Test
+    @DisplayName("Falta fechaAplicacion → 400")
+    void faltaFechaAplicacion_responde400() throws Exception {
+        mockMvc.perform(
+                        get("/api/precios")
+                                .param("idProducto", "35455")
+                                .param("idCadena", "1"))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @DisplayName("Falta idProducto → 400")
+    void faltaIdProducto_responde400() throws Exception {
+        mockMvc.perform(
+                        get("/api/precios")
+                                .param("fechaAplicacion", "2020-06-14T10:00:00")
+                                .param("idCadena", "1"))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @DisplayName("Falta idCadena → 400")
+    void faltaIdCadena_responde400() throws Exception {
+        mockMvc.perform(
+                        get("/api/precios")
+                                .param("fechaAplicacion", "2020-06-14T10:00:00")
+                                .param("idProducto", "35455"))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @DisplayName("fechaAplicacion con formato no parseable → 400")
+    void fechaAplicacionInvalida_responde400() throws Exception {
+        mockMvc.perform(
+                        get("/api/precios")
+                                .param("fechaAplicacion", "no-es-fecha")
+                                .param("idProducto", "35455")
+                                .param("idCadena", "1"))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @DisplayName("idProducto no numérico → 400")
+    void idProductoNoNumerico_responde400() throws Exception {
+        mockMvc.perform(
+                        get("/api/precios")
+                                .param("fechaAplicacion", "2020-06-14T10:00:00")
+                                .param("idProducto", "xyz")
+                                .param("idCadena", "1"))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @DisplayName("idCadena no numérico → 400")
+    void idCadenaNoNumerico_responde400() throws Exception {
+        mockMvc.perform(
+                        get("/api/precios")
+                                .param("fechaAplicacion", "2020-06-14T10:00:00")
+                                .param("idProducto", "35455")
+                                .param("idCadena", "no-numerico"))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @Sql("/test-desempate-mismo-inicio-id.sql")
+    @DisplayName("Misma prioridad e intervalo idéntico: gana la fila con id mayor")
+    void desempate_mismoInicio_mayorId() throws Exception {
+        mockMvc.perform(
+                        get("/api/precios")
+                                .param("fechaAplicacion", "2020-08-01T12:00:00")
+                                .param("idProducto", "99902")
+                                .param("idCadena", "1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.tarifa").value(21))
+                .andExpect(jsonPath("$.precio").value(20.00));
+    }
+
+    @Test
+    @DisplayName("Instante exacto en fechaInicio de tarifa 2 (15:00) aplica tarifa 2")
+    void limiteInferiorVigencia_tarifa2_inclusive() throws Exception {
+        mockMvc.perform(
+                        get("/api/precios")
+                                .param("fechaAplicacion", "2020-06-14T15:00:00")
+                                .param("idProducto", "35455")
+                                .param("idCadena", "1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.tarifa").value(2))
+                .andExpect(jsonPath("$.precio").value(25.45));
+    }
+
+    @Test
+    @DisplayName("Instante exacto en fechaFin de tarifa 2 (18:30) aplica tarifa 2")
+    void limiteSuperiorVigencia_tarifa2_inclusive() throws Exception {
+        mockMvc.perform(
+                        get("/api/precios")
+                                .param("fechaAplicacion", "2020-06-14T18:30:00")
+                                .param("idProducto", "35455")
+                                .param("idCadena", "1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.tarifa").value(2))
+                .andExpect(jsonPath("$.precio").value(25.45));
+    }
+
+    @Test
+    @DisplayName("Producto inexistente en datos → 404")
+    void productoSinFilas_responde404() throws Exception {
+        mockMvc.perform(
+                        get("/api/precios")
+                                .param("fechaAplicacion", "2020-06-14T10:00:00")
+                                .param("idProducto", "999999999")
+                                .param("idCadena", "1"))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.mensaje").value(containsString("999999999")));
     }
 }

@@ -1,7 +1,7 @@
 package com.comercio.precios.adaptador.salida.persistencia;
 
 import java.time.LocalDateTime;
-import java.util.List;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -13,13 +13,15 @@ import org.springframework.data.repository.query.Param;
 public interface RepositorioPrecioJpa extends JpaRepository<EntidadPrecioJpa, Long> {
 
     /**
-     * Obtiene las tarifas aplicables ordenadas por prioridad descendente (la primera es la ganadora).
+     * Obtiene las tarifas aplicables ordenadas para desempate determinista: mayor {@code prioridad}
+     * primero; a igual prioridad, vigencia con {@code fechaInicio} más reciente; a igualdad, mayor
+     * {@code id} (última fila persistida).
      *
      * @param idCadena    cadena
      * @param idProducto  producto
      * @param fecha       instante de aplicación
      * @param pageable    limita a una fila para eficiencia
-     * @return lista con como máximo un elemento
+     * @return página con como máximo un elemento (según {@code pageable})
      */
     @Query(
             """
@@ -28,9 +30,9 @@ public interface RepositorioPrecioJpa extends JpaRepository<EntidadPrecioJpa, Lo
               AND p.idProducto = :idProducto
               AND :fecha >= p.fechaInicio
               AND :fecha <= p.fechaFin
-            ORDER BY p.prioridad DESC
+            ORDER BY p.prioridad DESC, p.fechaInicio DESC, p.id DESC
             """)
-    List<EntidadPrecioJpa> buscarAplicables(
+    Page<EntidadPrecioJpa> buscarAplicables(
             @Param("idCadena") Long idCadena,
             @Param("idProducto") Long idProducto,
             @Param("fecha") LocalDateTime fecha,

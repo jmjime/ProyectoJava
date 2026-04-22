@@ -79,7 +79,7 @@ La documentación interactiva (**OpenAPI 3** y **Swagger UI**) la genera **sprin
 | Elemento | Función |
 |----------|---------|
 | `EntidadPrecioJpa` | Mapeo ORM de la tabla `precios` (H2). |
-| `RepositorioPrecioJpa` | Spring Data JPA: consulta con `ORDER BY prioridad DESC` y **una sola página** (`PageRequest.of(0,1)`) para eficiencia. |
+| `RepositorioPrecioJpa` | Spring Data JPA: consulta con `ORDER BY prioridad DESC, fechaInicio DESC, id DESC` (desempate determinista) y **una sola página** (`PageRequest.of(0,1)`). La entidad define un **índice** compuesto `(id_cadena, id_producto, prioridad)` para consultas por cadena/producto. |
 | `AdaptadorRepositorioPrecios` | Implementa `PuertoRepositorioPrecios`, traduce `EntidadPrecioJpa` → `Precio`. |
 
 ### 3.5. Configuración OpenAPI (`com.comercio.precios.configuracion`)
@@ -111,9 +111,9 @@ sequenceDiagram
   Ctrl->>UC: ejecutar(idProducto, idCadena, fecha)
   UC->>AD: buscarPrecioAplicable(...)
   AD->>R: buscarAplicables(..., page 0 size 1)
-  R->>DB: SELECT ... ORDER BY prioridad DESC LIMIT 1
+  R->>DB: SELECT ... ORDER BY prioridad DESC, fecha_inicio DESC, id DESC LIMIT 1
   DB-->>R: fila o vacío
-  R-->>AD: lista
+  R-->>AD: Page (máx. 1 fila)
   AD-->>UC: Optional Precio
   alt sin precio
     UC-->>Ctrl: PrecioNoEncontradoException

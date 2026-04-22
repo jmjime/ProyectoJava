@@ -13,7 +13,9 @@ import org.springframework.data.repository.query.Param;
 public interface RepositorioPrecioJpa extends JpaRepository<EntidadPrecioJpa, Long> {
 
     /**
-     * Obtiene las tarifas aplicables ordenadas por prioridad descendente (la primera es la ganadora).
+     * Obtiene las tarifas aplicables ordenadas para desempate determinista: mayor {@code prioridad}
+     * primero; a igual prioridad, vigencia con {@code fechaInicio} más reciente; a igualdad, mayor
+     * {@code id} (última fila persistida).
      *
      * @param idCadena    cadena
      * @param idProducto  producto
@@ -28,7 +30,7 @@ public interface RepositorioPrecioJpa extends JpaRepository<EntidadPrecioJpa, Lo
               AND p.idProducto = :idProducto
               AND :fecha >= p.fechaInicio
               AND :fecha <= p.fechaFin
-            ORDER BY p.prioridad DESC
+            ORDER BY p.prioridad DESC, p.fechaInicio DESC, p.id DESC
             """)
     Page<EntidadPrecioJpa> buscarAplicables(
             @Param("idCadena") Long idCadena,

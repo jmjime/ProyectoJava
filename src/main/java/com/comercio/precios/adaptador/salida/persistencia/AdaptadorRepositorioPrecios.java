@@ -1,7 +1,7 @@
 package com.comercio.precios.adaptador.salida.persistencia;
 
 import com.comercio.precios.dominio.Precio;
-import com.comercio.precios.dominio.PuertoRepositorioPrecios;
+import com.comercio.precios.dominio.puerto.salida.PuertoRepositorioPrecios;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;

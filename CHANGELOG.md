@@ -20,8 +20,17 @@ y el proyecto adhiere a [Semantic Versioning 2.0.0](https://semver.org/lang/es/)
 - `RepositorioPrecioJpa` resuelve la tarifa aplicable con un método derivado `findFirst…OrderBy…` envuelto en un `buscarPrecioAplicable(idProducto, idCadena, fecha)` de firma corta; se elimina la `@Query` JPQL y el uso de `Page<…>` + `PageRequest.of(0,1)`, con lo que Hibernate ya no emite `count` complementario para esta consulta.
 - `AdaptadorRepositorioPrecios` invoca al repositorio con el orden canónico `(idProducto, idCadena, fecha)` definido por el puerto de salida (antes invertía producto y cadena al pasarlos a la `@Query`).
 - `EntidadPrecioJpa` queda sellada frente a mutación externa: `@Setter` público eliminado; `@NoArgsConstructor` pasa a `protected` (para Hibernate) y se añade `@AllArgsConstructor(access = PACKAGE)` para construcción desde pruebas del propio paquete. El índice `idx_precios_cadena_producto_prioridad` sobre `(id_cadena, id_producto, prioridad)` se preserva sin cambios.
+- `com.comercio.precios.dominio.Precio` pasa de `class` a `record` Java 17 con canonical constructor que valida invariantes de negocio (no-nulos, `fechaInicio <= fechaFin`, `precioFinal >= 0`, `moneda` de 3 letras mayúsculas). `RespuestaPrecioDto` se adapta a los accessors de `record`.
+- Paquete `com.comercio.precios.service` renombrado a `com.comercio.precios.aplicacion`; clase `ObtenerPrecioAplicableCasoUso` renombrada a `CasoUsoConsultarPrecioAplicable` e implementa el puerto de entrada `ConsultarPrecioAplicable`. Método `ejecutar` renombrado a `consultar`. `PrecioNoEncontradoException` acompaña al nuevo paquete.
+- `ControladorPrecio` pasa a depender del puerto de entrada `ConsultarPrecioAplicable` en vez de la clase concreta; `ControladorPrecioWebMvcTest`, `ManejadorExcepcionesGlobal` y el pointcut de `AspectoRegistroTransversal` se actualizan en consecuencia (el pointcut ahora cubre `com.comercio.precios.aplicacion..*`).
 
-> Esta entrada corresponde a los subconjuntos **control-versiones** y **persistencia-eficiente** del cambio `revision` (ver `openspec/changes/revision/`). Las capacidades `dominio-hexagonal` y `testing-robusto` permanecen pendientes de aplicar en commits posteriores.
+### Added
+
+- Puerto entrante `com.comercio.precios.dominio.puerto.entrada.ConsultarPrecioAplicable` y reubicación del puerto saliente `PuertoRepositorioPrecios` a `com.comercio.precios.dominio.puerto.salida`.
+- `com.comercio.precios.configuracion.BeansAplicacion` registra el caso de uso como `@Bean`, materializando ADR-5 (arranque Spring invertido hacia configuración). El dominio y la aplicación quedan libres de imports de `org.springframework.*`.
+- Test de arquitectura `ArquitecturaHexagonalTest` con ArchUnit 1.4.1 (`scope=test`) que verifica: (a) `dominio` y `aplicacion` no dependen de `org.springframework..`; (b) `dominio` no depende de `jakarta.persistence..`.
+
+> Esta entrada corresponde a los subconjuntos **control-versiones**, **persistencia-eficiente** y **dominio-hexagonal** del cambio `revision` (ver `openspec/changes/revision/`). La capacidad `testing-robusto` permanece pendiente de aplicar en commits posteriores.
 
 ## [0.1.0] - 2026-04-16
 

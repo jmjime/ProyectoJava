@@ -19,7 +19,7 @@ public class AspectoRegistroTransversal {
      * Punto de corte: métodos públicos en paquetes de aplicación o adaptadores.
      */
     @Pointcut(
-            "execution(public * com.comercio.precios.service..*(..)) "
+            "execution(public * com.comercio.precios.aplicacion..*(..)) "
                     + "|| execution(public * com.comercio.precios.adaptador.entrada..*(..)) "
                     + "|| execution(public * com.comercio.precios.adaptador.salida.persistencia.AdaptadorRepositorioPrecios.*(..))")
     public void capasInstrumentadas() {}

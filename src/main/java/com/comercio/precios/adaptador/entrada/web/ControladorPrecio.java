@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.comercio.precios.service.ObtenerPrecioAplicableCasoUso;
+import com.comercio.precios.dominio.puerto.entrada.ConsultarPrecioAplicable;
 
 /**
  * Adaptador REST de entrada: expone la consulta de precio aplicable.
@@ -24,7 +24,7 @@ import com.comercio.precios.service.ObtenerPrecioAplicableCasoUso;
 @RequiredArgsConstructor
 public class ControladorPrecio {
 
-    private final ObtenerPrecioAplicableCasoUso obtenerPrecioAplicableCasoUso;
+    private final ConsultarPrecioAplicable consultarPrecioAplicable;
 
     /**
      * Consulta el precio aplicable para un producto y cadena en una fecha concreta.
@@ -56,6 +56,6 @@ public class ControladorPrecio {
                     @RequestParam("idCadena")
                     Long idCadena) {
         return RespuestaPrecioDto.desdeDominio(
-                obtenerPrecioAplicableCasoUso.ejecutar(idProducto, idCadena, fechaAplicacion));
+                consultarPrecioAplicable.consultar(idProducto, idCadena, fechaAplicacion));
     }
 }

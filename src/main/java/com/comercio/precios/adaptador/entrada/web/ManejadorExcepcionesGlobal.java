@@ -7,7 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import com.comercio.precios.service.PrecioNoEncontradoException;
+import com.comercio.precios.aplicacion.PrecioNoEncontradoException;
 
 /**
  * Traduce excepciones de aplicación a respuestas HTTP coherentes.

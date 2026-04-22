@@ -9,12 +9,17 @@ import jakarta.persistence.Index;
 import jakarta.persistence.Table;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 /**
  * Entidad JPA que mapea la tabla de precios en H2.
+ *
+ * <p>Deliberadamente sin {@code @Setter} público: el estado es poblado por Hibernate mediante
+ * acceso a campos y por tests del propio paquete vía el constructor con todos los argumentos.
+ * El constructor sin argumentos es {@code protected} porque solo lo necesita el proveedor JPA.
  */
 @Entity
 @Table(
@@ -25,8 +30,8 @@ import lombok.Setter;
                     columnList = "id_cadena,id_producto,prioridad")
         })
 @Getter
-@Setter
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PACKAGE)
 public class EntidadPrecioJpa {
 
     @Id

@@ -74,7 +74,7 @@ mvn test
 mvn verify
 ```
 
-Hay **pruebas de integración** (`ControladorPrecioTest`, `OpenApiDocsTest`) sobre el contexto completo, **pruebas unitarias** del caso de uso (`ObtenerPrecioAplicableCasoUsoTest`) y del mapeo DTO (`RespuestaPrecioDtoTest`). Surefire incluye `*Test.java`, `*Tests.java` y `*IT.java`.
+Hay **pruebas de integración** (`ControladorPrecioTest`, `OpenApiDocsTest`) sobre el contexto completo, **prueba de slice MVC** (`ControladorPrecioWebMvcTest`: 404 vía `ManejadorExcepcionesGlobal` con caso de uso mockeado), **pruebas unitarias** del dominio (`PrecioTest`), del caso de uso (`ObtenerPrecioAplicableCasoUsoTest`) y del mapeo DTO (`RespuestaPrecioDtoTest`). Surefire incluye `*Test.java`, `*Tests.java` y `*IT.java`.
 
 ## Docker
 
@@ -96,7 +96,8 @@ Con imagen suelta: `docker run -e SPRING_PROFILES_ACTIVE=prod -p 8080:8080 servi
 ## Notas Spring Boot 4
 
 - AOP: dependencia **`spring-boot-starter-aspectj`** (sustituye al antiguo `spring-boot-starter-aop`).
-- Tests MVC: dependencia de test **`spring-boot-starter-webmvc-test`** e import `org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc`.
+- Tests MVC: dependencia de test **`spring-boot-starter-webmvc-test`**. Imports correctos en Boot 4 (no usar el paquete antiguo `org.springframework.boot.test.autoconfigure.web.servlet.*`): `org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc` y, para pruebas de slice de controlador, `org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest`.
+
 
 ## IDE y Lombok
 

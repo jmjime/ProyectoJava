@@ -17,8 +17,11 @@ y el proyecto adhiere a [Semantic Versioning 2.0.0](https://semver.org/lang/es/)
 ### Changed
 
 - `.gitignore` consolidado con secciones comentadas (build, IDEs, OS, logs, entorno local) incluyendo `build/`, `out/`, `Thumbs.db` y la excepción `!.env.example`.
+- `RepositorioPrecioJpa` resuelve la tarifa aplicable con un método derivado `findFirst…OrderBy…` envuelto en un `buscarPrecioAplicable(idProducto, idCadena, fecha)` de firma corta; se elimina la `@Query` JPQL y el uso de `Page<…>` + `PageRequest.of(0,1)`, con lo que Hibernate ya no emite `count` complementario para esta consulta.
+- `AdaptadorRepositorioPrecios` invoca al repositorio con el orden canónico `(idProducto, idCadena, fecha)` definido por el puerto de salida (antes invertía producto y cadena al pasarlos a la `@Query`).
+- `EntidadPrecioJpa` queda sellada frente a mutación externa: `@Setter` público eliminado; `@NoArgsConstructor` pasa a `protected` (para Hibernate) y se añade `@AllArgsConstructor(access = PACKAGE)` para construcción desde pruebas del propio paquete. El índice `idx_precios_cadena_producto_prioridad` sobre `(id_cadena, id_producto, prioridad)` se preserva sin cambios.
 
-> Esta entrada corresponde al subconjunto **control-versiones** del cambio `revision` (ver `openspec/changes/revision/`). El resto del cambio (`dominio-hexagonal`, `persistencia-eficiente`, `testing-robusto`) permanece pendiente de aplicar en commits posteriores.
+> Esta entrada corresponde a los subconjuntos **control-versiones** y **persistencia-eficiente** del cambio `revision` (ver `openspec/changes/revision/`). Las capacidades `dominio-hexagonal` y `testing-robusto` permanecen pendientes de aplicar en commits posteriores.
 
 ## [0.1.0] - 2026-04-16
 

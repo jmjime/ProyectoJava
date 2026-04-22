@@ -5,7 +5,6 @@ import com.comercio.precios.dominio.PuertoRepositorioPrecios;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Component;
 
 /**
@@ -24,9 +23,7 @@ public class AdaptadorRepositorioPrecios implements PuertoRepositorioPrecios {
     public Optional<Precio> buscarPrecioAplicable(
             Long idProducto, Long idCadena, LocalDateTime fechaAplicacion) {
         return repositorioPrecioJpa
-                .buscarAplicables(idCadena, idProducto, fechaAplicacion, PageRequest.of(0, 1))
-                .stream()
-                .findFirst()
+                .buscarPrecioAplicable(idProducto, idCadena, fechaAplicacion)
                 .map(this::mapearADominio);
     }
 

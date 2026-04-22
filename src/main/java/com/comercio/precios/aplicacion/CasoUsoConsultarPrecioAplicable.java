@@ -1,30 +1,27 @@
-package com.comercio.precios.service;
+package com.comercio.precios.aplicacion;
 
 import com.comercio.precios.dominio.Precio;
-import com.comercio.precios.dominio.PuertoRepositorioPrecios;
+import com.comercio.precios.dominio.puerto.entrada.ConsultarPrecioAplicable;
+import com.comercio.precios.dominio.puerto.salida.PuertoRepositorioPrecios;
 import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
 
 /**
- * Caso de uso de aplicación: obtiene el precio aplicable delegando en el puerto de persistencia.
+ * Caso de uso que implementa el puerto de entrada {@link ConsultarPrecioAplicable} delegando en
+ * el puerto de salida {@link PuertoRepositorioPrecios}. Esta clase es deliberadamente
+ * <em>Spring-free</em>: su registro como bean se realiza en
+ * {@code com.comercio.precios.configuracion.BeansAplicacion} mediante {@code @Bean}.
  */
-@Service
 @RequiredArgsConstructor
-public class ObtenerPrecioAplicableCasoUso {
+public class CasoUsoConsultarPrecioAplicable implements ConsultarPrecioAplicable {
 
     private final PuertoRepositorioPrecios puertoRepositorioPrecios;
 
     /**
-     * Ejecuta la consulta de negocio y devuelve el precio único aplicable.
-     *
-     * @param idProducto      identificador del producto
-     * @param idCadena        identificador de la cadena
-     * @param fechaAplicacion fecha y hora de aplicación del precio
-     * @return modelo de dominio {@link Precio}
-     * @throws PrecioNoEncontradoException si no hay tarifa que cubra la fecha
+     * {@inheritDoc}
      */
-    public Precio ejecutar(Long idProducto, Long idCadena, LocalDateTime fechaAplicacion) {
+    @Override
+    public Precio consultar(Long idProducto, Long idCadena, LocalDateTime fechaAplicacion) {
         return puertoRepositorioPrecios
                 .buscarPrecioAplicable(idProducto, idCadena, fechaAplicacion)
                 .orElseThrow(

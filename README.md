@@ -102,3 +102,50 @@ Con imagen suelta: `docker run -e SPRING_PROFILES_ACTIVE=prod -p 8080:8080 servi
 ## IDE y Lombok
 
 Instala el **plugin Lombok** en IntelliJ IDEA o VS Code para que el IDE reconozca las anotaciones generadas.
+
+## Convenciones de commits y ramas
+
+Este repositorio adopta **[Conventional Commits 1.0.0](https://www.conventionalcommits.org/es/v1.0.0/)** para el historial y **[Keep a Changelog 1.1.0](https://keepachangelog.com/es-ES/1.1.0/)** para `CHANGELOG.md`. Los asuntos de commit se escriben en **castellano** y en **modo imperativo** ("añade", "corrige", "documenta", …).
+
+### Formato del asunto
+
+```
+<tipo>(<ámbito opcional>): <resumen ≤ 72 caracteres>
+```
+
+Activa la plantilla local para que el editor te la ofrezca al hacer `git commit`:
+
+```bash
+git config --local commit.template .gitmessage
+```
+
+### Tipos permitidos
+
+| Tipo       | Uso                                                                 | Ejemplo |
+|------------|----------------------------------------------------------------------|---------|
+| `feat`     | Nueva funcionalidad para el usuario final                            | `feat(api): añade filtro por moneda al endpoint de precios` |
+| `fix`      | Corrección de defecto                                                | `fix(persistencia): corrige orden de argumentos en el adaptador` |
+| `refactor` | Cambio interno sin alterar comportamiento externo                    | `refactor(dominio): convierte Precio a record inmutable` |
+| `perf`     | Mejora de rendimiento                                                | `perf(persistencia): evita count query con findFirst...OrderBy` |
+| `test`     | Añade o corrige pruebas                                              | `test(persistencia): añade DataJpaTest del orden de desempate` |
+| `docs`     | Sólo documentación                                                   | `docs(readme): documenta convenciones de commits` |
+| `build`    | Build o dependencias (pom.xml, Dockerfile, Maven wrapper)            | `build(deps): añade flyway-core en scope runtime` |
+| `ci`       | Pipelines y configuración de integración continua                    | `ci: publica informe JaCoCo como artefacto` |
+| `chore`    | Mantenimiento que no encaja en los anteriores                        | `chore(build): sube umbral JaCoCo de líneas a 0.85` |
+| `revert`   | Revierte un commit anterior (incluir hash en el cuerpo)              | `revert: feat(api) filtro por moneda` |
+
+Cambios incompatibles: añadir `!` antes de los dos puntos (`feat(api)!: elimina campo tarifa`) **y** un pie `BREAKING CHANGE: ...` describiendo el impacto.
+
+### Política de ramas y Pull Requests
+
+- Rama principal: `main`, **protegida** (no se permite *push* directo ni *force-push*).
+- Trabajo siempre en rama corta con prefijo por tipo: `feat/<slug>`, `fix/<slug>`, `chore/<slug>`, `refactor/<slug>`, `docs/<slug>`.
+- La integración se realiza **exclusivamente vía Pull Request** con *squash merge* hacia `main`. El título del PR sigue el mismo formato Conventional Commits y su descripción incluye como mínimo:
+  - **Resumen**: qué cambia y por qué.
+  - **Plan de pruebas**: pasos (o comandos) para validar el PR.
+  - Referencia al cambio OpenSpec o a la tarea relevante (p. ej. `openspec/changes/revision/`).
+- Un PR equivale a un cambio lógico; si hay dos propósitos, son dos PRs (o, al menos, dos commits con `squash merge` desactivado).
+
+### `CHANGELOG.md`
+
+Todo cambio relevante se anota en la sección `[Unreleased]` de [`CHANGELOG.md`](CHANGELOG.md) antes de mergear el PR. Al publicar una versión, la sección se renombra con el número y la fecha, y se crea una nueva `[Unreleased]` vacía.

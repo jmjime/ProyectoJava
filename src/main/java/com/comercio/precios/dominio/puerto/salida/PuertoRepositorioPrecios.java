@@ -1,5 +1,6 @@
-package com.comercio.precios.dominio;
+package com.comercio.precios.dominio.puerto.salida;
 
+import com.comercio.precios.dominio.Precio;
 import java.time.LocalDateTime;
 import java.util.Optional;
 

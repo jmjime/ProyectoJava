@@ -1,0 +1,33 @@
+# <tipo>(<ámbito opcional>): <resumen en castellano, modo imperativo, máx. 72 chars>
+#
+# Cuerpo opcional (envolver a 72 columnas). Explica el PORQUÉ del cambio,
+# no el qué (el diff ya lo muestra). Separado del asunto por una línea en blanco.
+#
+# Pie opcional: referencias, BREAKING CHANGE, co-autores.
+#
+# Ejemplos válidos:
+#   feat(dominio): valida invariantes de Precio en el canonical constructor
+#   fix(persistencia): corrige orden de argumentos en el adaptador de precios
+#   refactor(aplicacion): elimina acoplamiento con Spring en el caso de uso
+#   test(persistencia): añade DataJpaTest para el orden de desempate
+#   docs(readme): documenta convenciones de commits y ramas
+#   chore(build): sube umbral JaCoCo de líneas a 0.85
+#
+# Tipos permitidos (Conventional Commits 1.0.0):
+#   feat      → nueva funcionalidad
+#   fix       → corrección de defecto
+#   refactor  → cambio interno sin alterar comportamiento externo
+#   perf      → mejora de rendimiento
+#   test      → añade o corrige pruebas
+#   docs      → sólo documentación
+#   build     → sistema de build o dependencias (pom.xml, Dockerfile)
+#   ci        → pipelines y configuración de integración continua
+#   chore     → mantenimiento que no encaja en los anteriores
+#   revert    → revierte un commit anterior (incluir hash en el cuerpo)
+#
+# Reglas:
+#   1. Asunto en castellano, modo imperativo ("añade", "corrige", "documenta").
+#   2. Sin punto final en el asunto.
+#   3. Asunto ≤ 72 caracteres.
+#   4. Usar `!` o pie `BREAKING CHANGE:` para cambios incompatibles.
+#   5. Un commit = un cambio lógico. Si hay dos propósitos, son dos commits.

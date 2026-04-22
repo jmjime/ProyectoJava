@@ -35,12 +35,12 @@ public record RespuestaPrecioDto(
      */
     public static RespuestaPrecioDto desdeDominio(Precio precio) {
         return new RespuestaPrecioDto(
-                precio.getIdProducto(),
-                precio.getIdCadena(),
-                precio.getTarifa(),
-                precio.getFechaInicio(),
-                precio.getFechaFin(),
-                precio.getPrecioFinal(),
-                precio.getMoneda());
+                precio.idProducto(),
+                precio.idCadena(),
+                precio.tarifa(),
+                precio.fechaInicio(),
+                precio.fechaFin(),
+                precio.precioFinal(),
+                precio.moneda());
     }
 }

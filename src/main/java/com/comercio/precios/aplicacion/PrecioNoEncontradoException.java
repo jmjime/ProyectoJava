@@ -1,4 +1,4 @@
-package com.comercio.precios.service;
+package com.comercio.precios.aplicacion;
 
 /**
  * Indica que no existe ninguna tarifa aplicable para la combinación producto-cadena-fecha solicitada.

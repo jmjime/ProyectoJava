@@ -1,4 +1,4 @@
-package com.comercio.precios.service;
+package com.comercio.precios.aplicacion;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -6,7 +6,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.comercio.precios.dominio.Precio;
-import com.comercio.precios.dominio.PuertoRepositorioPrecios;
+import com.comercio.precios.dominio.puerto.salida.PuertoRepositorioPrecios;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -18,17 +18,17 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-class ObtenerPrecioAplicableCasoUsoTest {
+class CasoUsoConsultarPrecioAplicableTest {
 
     @Mock
     private PuertoRepositorioPrecios puertoRepositorioPrecios;
 
     @InjectMocks
-    private ObtenerPrecioAplicableCasoUso casoUso;
+    private CasoUsoConsultarPrecioAplicable casoUso;
 
     @Test
     @DisplayName("Devuelve el precio cuando el puerto encuentra una tarifa aplicable")
-    void ejecutar_cuandoHayPrecio_devuelveDominio() {
+    void consultar_cuandoHayPrecio_devuelveDominio() {
         var fecha = LocalDateTime.of(2020, 6, 14, 10, 0);
         var precio =
                 new Precio(
@@ -42,7 +42,7 @@ class ObtenerPrecioAplicableCasoUsoTest {
         when(puertoRepositorioPrecios.buscarPrecioAplicable(35455L, 1L, fecha))
                 .thenReturn(Optional.of(precio));
 
-        var resultado = casoUso.ejecutar(35455L, 1L, fecha);
+        var resultado = casoUso.consultar(35455L, 1L, fecha);
 
         assertThat(resultado).isSameAs(precio);
         verify(puertoRepositorioPrecios).buscarPrecioAplicable(35455L, 1L, fecha);
@@ -50,12 +50,12 @@ class ObtenerPrecioAplicableCasoUsoTest {
 
     @Test
     @DisplayName("Lanza PrecioNoEncontradoException cuando el puerto no encuentra tarifa")
-    void ejecutar_cuandoVacio_lanzaPrecioNoEncontrado() {
+    void consultar_cuandoVacio_lanzaPrecioNoEncontrado() {
         var fecha = LocalDateTime.of(2020, 1, 1, 12, 0);
         when(puertoRepositorioPrecios.buscarPrecioAplicable(99L, 2L, fecha))
                 .thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> casoUso.ejecutar(99L, 2L, fecha))
+        assertThatThrownBy(() -> casoUso.consultar(99L, 2L, fecha))
                 .isInstanceOf(PrecioNoEncontradoException.class)
                 .hasMessageContaining("99")
                 .hasMessageContaining("2");

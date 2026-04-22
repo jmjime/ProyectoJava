@@ -68,7 +68,13 @@ curl -s "http://localhost:8080/api/precios?fechaAplicacion=2020-06-14T16:00:00&i
 mvn test
 ```
 
-Incluye **5 pruebas de integración** (`ControladorPrecioIT`) que reproducen los escenarios del enunciado y **1 prueba** (`OpenApiDocsIT`) que comprueba que `/v3/api-docs` responde e incluye el path `/api/precios`. Los ficheros `*IT.java` están incluidos explícitamente en **Surefire**.
+**Cobertura (JaCoCo):** informe HTML en `target/site/jacoco/index.html`. Umbral mínimo de líneas del bundle (propiedad `jacoco.line.minimum` en el `pom`) en la fase `verify`:
+
+```bash
+mvn verify
+```
+
+Hay **pruebas de integración** (`ControladorPrecioTest`, `OpenApiDocsTest`) sobre el contexto completo, **prueba de slice MVC** (`ControladorPrecioWebMvcTest`: 404 vía `ManejadorExcepcionesGlobal` con caso de uso mockeado), **pruebas unitarias** del dominio (`PrecioTest`), del caso de uso (`ObtenerPrecioAplicableCasoUsoTest`) y del mapeo DTO (`RespuestaPrecioDtoTest`). Surefire incluye `*Test.java`, `*Tests.java` y `*IT.java`.
 
 ## Docker
 
@@ -90,7 +96,8 @@ Con imagen suelta: `docker run -e SPRING_PROFILES_ACTIVE=prod -p 8080:8080 servi
 ## Notas Spring Boot 4
 
 - AOP: dependencia **`spring-boot-starter-aspectj`** (sustituye al antiguo `spring-boot-starter-aop`).
-- Tests MVC: dependencia de test **`spring-boot-starter-webmvc-test`** e import `org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc`.
+- Tests MVC: dependencia de test **`spring-boot-starter-webmvc-test`**. Imports correctos en Boot 4 (no usar el paquete antiguo `org.springframework.boot.test.autoconfigure.web.servlet.*`): `org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc` y, para pruebas de slice de controlador, `org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest`.
+
 
 ## IDE y Lombok
 

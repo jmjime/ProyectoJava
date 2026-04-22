@@ -5,6 +5,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
 import jakarta.persistence.Table;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -16,7 +17,13 @@ import lombok.Setter;
  * Entidad JPA que mapea la tabla de precios en H2.
  */
 @Entity
-@Table(name = "precios")
+@Table(
+        name = "precios",
+        indexes = {
+            @Index(
+                    name = "idx_precios_cadena_producto_prioridad",
+                    columnList = "id_cadena,id_producto,prioridad")
+        })
 @Getter
 @Setter
 @NoArgsConstructor
